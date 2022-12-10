@@ -6,6 +6,29 @@ from tensorflow import keras
 from infra.brixia_model import bscore_model
 
 
+def _get_severity(score):
+    global_score = 0
+
+    global_score += score[0][0]
+    global_score += score[0][1]
+    global_score += score[1][0]
+    global_score += score[1][1]
+    global_score += score[2][0]
+    global_score += score[2][1]
+
+    severity = ''
+    if global_score == 0:
+        severity = 'Normal'
+    elif 1 <= global_score <= 6:
+        severity = 'Ringan'
+    elif 7 <= global_score <= 12:
+        severity = 'Normal'
+    elif 13 <= global_score <= 18:
+        severity = 'Berat'
+
+    return severity
+
+
 def _preprocess_input(original_image):
     img = cv2.cvtColor(original_image, cv2.COLOR_RGB2GRAY)
     img = img.astype(np.uint8)
@@ -28,7 +51,7 @@ def predict_bscore(xray_image):
     prediction = bscore_model.predict(np.array([original_image]))[0]
     prediction = np.argmax(np.array(prediction), axis=-1)
 
-    print(prediction)
+    severity = _get_severity(prediction)
 
     return {
         "score": {
@@ -45,5 +68,5 @@ def predict_bscore(xray_image):
                 "right": int(prediction[2][1])
             }
         },
-        "severity": "Medium"
+        "severity": severity
     }
