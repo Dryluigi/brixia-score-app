@@ -32,7 +32,12 @@ def predict():
     response = predict_bscore.predict_bscore(file)
 
     return Response(
-        response=json.dumps(response),
+        response=json.dumps({
+            "success": True,
+            "message": "Success",
+            "code": 200,
+            "data": response
+        }),
         status=200,
         mimetype="application/json"
     )
