@@ -8,12 +8,44 @@ import ScoreResult from './components/ScoreResult/ScoreResult';
 import ImageInput from './components/ImageInput/ImageInput';
 import { useState } from 'react';
 import Footer from './components/Footer/Footer';
+import getBrixiaScore from './api/call/getBrixiaScore';
+import { BrixiaScore } from './models/brixia';
+
+interface ScorePair {
+  left: string;
+  right: string;
+}
 
 function App() {
   const [xrayImage, setXrayImage] = useState<string>('');
+  const [showScore, setShowScore] = useState<boolean>(false);
+  const [brixiaScore, setBrixiaScore] = useState<BrixiaScore>({
+    upper: { left: 0, right: 0 },
+    middle: { left: 0, right: 0 },
+    lower: { left: 0, right: 0 },
+  });
+  const [severity, setSeverity] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
 
   const fileInputChangeHandler = (fileSrc: string) => {
     setXrayImage(fileSrc)
+  }
+
+  const imageSubmitHandler = (xRay: File) => {
+    setLoading(true);
+    getBrixiaScore(xRay)
+      .then(res => {
+        console.log(res.data.data.score)
+        setBrixiaScore(res.data.data.score);
+        setSeverity(res.data.data.severity);
+        setShowScore(true);
+      })
+      .catch(e => {
+        setShowScore(false);
+      })
+      .finally(() => {
+        setLoading(false)
+      });
   }
 
   return (
@@ -33,14 +65,16 @@ function App() {
           <Stack sx={{ flex: 1, height: 'auto' }} direction="column" justifyContent="space-between">
             <Typography variant="h5">Brixia Scoring</Typography>
             <ScoreResult
-              topScore={{ left: 4, right: 2 }}
-              middleScore={{ left: 2, right: 2 }}
-              lowerScore={{ left: 3, right: 2 }}
-              severity={'Parah'}
-              show
+              topScore={brixiaScore.upper}
+              middleScore={brixiaScore.middle}
+              lowerScore={brixiaScore.lower}
+              severity={severity}
+              show={showScore}
             />
             <ImageInput
               onFileChange={fileInputChangeHandler}
+              onSubmit={imageSubmitHandler}
+              loading={loading}
             />
           </Stack>
         </Stack>

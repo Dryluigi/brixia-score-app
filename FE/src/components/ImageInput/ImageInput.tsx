@@ -3,6 +3,8 @@ import { ChangeEvent, useEffect, useState } from 'react';
 
 interface ImageInputProps {
     onFileChange?: (fileSrc: string) => void;
+    onSubmit: (xRay: File) => void;
+    loading?: boolean;
 }
 
 function ImageInput(props: ImageInputProps) {
@@ -22,7 +24,9 @@ function ImageInput(props: ImageInputProps) {
     }
 
     const submitHandler = () => {
-        console.log(imageFile);
+        if (imageFile && imageFile!.length > 0) {
+            props.onSubmit(imageFile[0]);
+        }
     }
 
 
@@ -38,10 +42,10 @@ function ImageInput(props: ImageInputProps) {
             />
             <Button
                 variant="contained"
-                disabled={submitDisabled}
+                disabled={submitDisabled || props.loading}
                 onClick={submitHandler}
             >
-                Submit
+                {!props.loading ? 'Submit' : 'Loading'}
             </Button>
         </Box>
     )
