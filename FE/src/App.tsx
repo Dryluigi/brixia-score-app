@@ -35,7 +35,6 @@ function App() {
     setLoading(true);
     getBrixiaScore(xRay)
       .then(res => {
-        console.log(res.data.data.score)
         setBrixiaScore(res.data.data.score);
         setSeverity(res.data.data.severity);
         setShowScore(true);
@@ -63,7 +62,7 @@ function App() {
         <Stack direction="row">
           <XRayImage imgUrl={xrayImage} />
           <Stack sx={{ flex: 1, height: 'auto' }} direction="column" justifyContent="space-between">
-            <Typography variant="h5">Brixia Scoring</Typography>
+            <Typography variant="h5" mb={2}>Brixia Scoring</Typography>
             <ScoreResult
               topScore={brixiaScore.upper}
               middleScore={brixiaScore.middle}
